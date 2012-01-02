@@ -5,8 +5,8 @@ MySQL Log Watcher
 
 Requirements
 ----------
-[Python 2.6+](http://www.python.org/getit/releases/2.6/)
-[Pygments](http://pygments.org/)
+- [Python 2.6+](http://www.python.org/getit/releases/2.6/)
+- [Pygments](http://pygments.org/)
 
 Mac OS X
 ----------
