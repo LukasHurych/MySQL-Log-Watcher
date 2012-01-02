@@ -1,7 +1,7 @@
 MySQL Log Watcher
 ==========
 
-![Screenshot](/screen.png)
+![Screenshot](/abdoc/MySQL-Log-Watcher/raw/master/screen.png)
 
 Requirements
 ----------
