@@ -1,6 +1,8 @@
 MySQL Log Watcher
 ==========
 
+Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.
+
 ![Screenshot](/abdoc/MySQL-Log-Watcher/raw/master/screen.png)
 
 Requirements
@@ -8,9 +10,9 @@ Requirements
 - [Python 2.6+](http://www.python.org/getit/releases/2.6/)
 - [Pygments](http://pygments.org/)
 
-Mac OS X
+Installation
 ----------
-if you already do not use mysql's config file, create empty one in /etc/my.cnf
+You need to enable general_log_file in your my.cnf config file.
 
         [mysqld]
         general_log_file        = /var/log/mysql/mysql.log
@@ -18,6 +20,8 @@ if you already do not use mysql's config file, create empty one in /etc/my.cnf
 
 and restart database server.
 
+Mac OS X users: if you already don't have mysql's config file, create empty one in /etc/my.cnf
+
 Now you can start the watcher
 
-        sudo python watcher.py
+        python watcher.py

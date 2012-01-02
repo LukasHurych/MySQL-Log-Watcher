@@ -4,10 +4,12 @@ from pygments import highlight
 from pygments.lexers import SqlLexer
 from pygments.formatters import Terminal256Formatter
 
-#TODO: set tail for last queries, formatters
+#TODO: set number of last queries, filename and formatters
 
 def rev_readlines(filename, bufsize=8192):
 	"""
+	Reads lines backwards from the file
+	
 	Based on: http://code.activestate.com/recipes/496941-simple-readlines-in-reverse-wdeque/
 	"""
 	f1 = open(filename, 'rb')
@@ -26,6 +28,9 @@ def rev_readlines(filename, bufsize=8192):
 	yield leftover + '\n'
 
 class LogWatcher(object):
+	"""
+	Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.
+	"""
 	def __init__(self, file_handle):
 		self.file_handle = open(file_handle, 'rb')
 
@@ -34,7 +39,9 @@ class LogWatcher(object):
 		self.loop()
 
 	def loop(self, interval=1):
-
+		"""
+		Watches the log file for changes
+		"""
 		content = ''
 
 		while True:
@@ -48,10 +55,10 @@ class LogWatcher(object):
 			else:
 				content += line
 
-	def watch(self, filename):
-		return filename
-
 	def tail(self, queries=20):
+		"""
+		Returns (specified number of) lines that contains just query
+		"""
 		queries_count = 0
 		lines = []
 
@@ -67,6 +74,9 @@ class LogWatcher(object):
 		return ''.join(reversed(lines))
 
 	def parse(self, content):
+		"""
+		Parses the lines from the log file
+		"""
 		match =  re.finditer(r"""^(\d+\s+(?P<date>(\d{1,2}:){2}\d{1,2}))?
 							 \s+(?P<content>(.+(\n(?!(\d+\s+\d+:|\s+\d+\s+\w)))?)+)""", content, re.MULTILINE | re.VERBOSE)
 
@@ -88,7 +98,15 @@ class LogWatcher(object):
 				last_date = None
 
 	def highlight_line(self, text):
+		"""
+		Returns highlighted line to be printed
+		"""
 		return highlight(text, SqlLexer(), Terminal256Formatter()).rstrip()
 
 if __name__ == "__main__":
-	l = LogWatcher('/var/log/mysql/mysql.log')
+	filename = '/var/log/mysql/mysql.log'
+	try:
+		l = LogWatcher(filename)
+	except IOError:
+		sys.stderr.write("Can't read file '%s' (Do you have sufficient privileges?)\n" % filename)
+		sys.exit(1)
