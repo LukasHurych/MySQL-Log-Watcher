@@ -1,5 +1,7 @@
 import os, sys, re, time, io
 
+import argparse
+
 from pygments import highlight
 from pygments.lexers import SqlLexer
 from pygments.formatters import Terminal256Formatter
@@ -110,3 +112,5 @@ if __name__ == "__main__":
 	except IOError:
 		sys.stderr.write("Can't read file '%s' (Do you have sufficient privileges?)\n" % filename)
 		sys.exit(1)
+	except KeyboardInterrupt:
+		sys.exit()
