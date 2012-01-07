@@ -6,7 +6,7 @@ from pygments import highlight
 from pygments.lexers import SqlLexer
 from pygments.formatters import Terminal256Formatter
 
-#TODO: set number of last queries, filename and formatters
+#TODO: set formatters
 
 def rev_readlines(filename, bufsize=8192):
 	"""
@@ -33,10 +33,10 @@ class LogWatcher(object):
 	"""
 	Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.
 	"""
-	def __init__(self, file_handle):
+	def __init__(self, file_handle, queries):
 		self.file_handle = open(file_handle, 'rb')
 
-		self.parse(self.tail())
+		self.parse(self.tail(queries=queries))
 		self.file_handle.seek(0,2)
 		self.loop()
 
@@ -57,7 +57,7 @@ class LogWatcher(object):
 			else:
 				content += line
 
-	def tail(self, queries=20):
+	def tail(self, queries):
 		"""
 		Returns (specified number of) lines that contains just query
 		"""
@@ -84,20 +84,25 @@ class LogWatcher(object):
 
 		last_date = None
 
+		quit_check = False
+
 		for m in match:
 			text = m.group('content')
 			date = m.group('date')
 			if date:
 				last_date = date
 
-			if re.search(r'\d+\s+?Quit', text):
-				print "-" * 80
+			if not quit_check:
+				if re.search(r'\d+\s+?Quit', text):
+					quit_check = True
+					print "-" * 80
 
 			if re.search(r'\d+\s+?Query', text):
 				match2 = re.match(r"\d+\s+[A-Za-z]+\s+(?P<query>.+)", text, re.DOTALL)
 
 				print (last_date + ' ' * (10 - len(last_date)) if last_date else ' ' * 10) + self.highlight_line(re.sub(r'\n', ' ', match2.group('query')))
 				last_date = None
+				quit_check = False
 
 	def highlight_line(self, text):
 		"""
@@ -108,7 +113,16 @@ class LogWatcher(object):
 if __name__ == "__main__":
 	filename = '/var/log/mysql/mysql.log'
 	try:
-		l = LogWatcher(filename)
+		parser = argparse.ArgumentParser(description="Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.")
+
+		parser.add_argument('--last', dest='last', default=20, help='set the number of last queries you want to see when the script starts')
+		parser.add_argument('--dont-format-queries', nargs='?', const=True, dest='format', help='if you do not wish queries to be formatted')
+
+		args = parser.parse_args()
+
+		print args.format
+
+		l = LogWatcher(filename, queries=int(args.last))
 	except IOError:
 		sys.stderr.write("Can't read file '%s' (Do you have sufficient privileges?)\n" % filename)
 		sys.exit(1)
