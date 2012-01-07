@@ -6,7 +6,8 @@ from pygments import highlight
 from pygments.lexers import SqlLexer
 from pygments.formatters import Terminal256Formatter
 
-#TODO: set formatters
+#TODO: set formatter
+#TODO: (don't) format queries
 
 def rev_readlines(filename, bufsize=8192):
 	"""
@@ -33,9 +34,10 @@ class LogWatcher(object):
 	"""
 	Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.
 	"""
-	def __init__(self, file_handle, queries):
+	def __init__(self, file_handle, queries, formatter=Terminal256Formatter()):
 		self.file_handle = open(file_handle, 'rb')
 
+		self.formatter = formatter
 		self.parse(self.tail(queries=queries))
 		self.file_handle.seek(0,2)
 		self.loop()
@@ -108,7 +110,7 @@ class LogWatcher(object):
 		"""
 		Returns highlighted line to be printed
 		"""
-		return highlight(text, SqlLexer(), Terminal256Formatter()).rstrip()
+		return highlight(text, SqlLexer(), self.formatter).rstrip()
 
 if __name__ == "__main__":
 	filename = '/var/log/mysql/mysql.log'
