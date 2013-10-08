@@ -3,7 +3,7 @@ MySQL Log Watcher
 
 Watches MySQL's general_log for changes and prints out nicely formatted SQL queries. Handy if you use ORM.
 
-![Screenshot](/abdoc/MySQL-Log-Watcher/raw/master/screen.png)
+![Screenshot](https://raw.github.com/LukasHurych/MySQL-Log-Watcher/master/screen.png)
 
 Requirements
 ----------
